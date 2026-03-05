@@ -33,9 +33,22 @@ export function useOnlineGame() {
   }, [state, roomCode]);
 
   const connect = useCallback(() => {
-    if (socketRef.current?.connected) return;
+    // Disconnect stale socket if present
+    if (socketRef.current) {
+      if (socketRef.current.connected) return;
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+
     const socket = io(SERVER_URL, { transports: ['polling', 'websocket'] });
     socketRef.current = socket;
+
+    socket.on('connect_error', (err) => {
+      setErrorMessage(`Could not reach server: ${err.message}`);
+      setRoomStatus('error');
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+    });
 
     socket.on('room:created', ({ roomCode: code, slot }: { roomCode: string; slot: Player }) => {
       setRoomCode(code);
@@ -53,14 +66,7 @@ export function useOnlineGame() {
     });
 
     socket.on('game:state', (newState: GameState) => {
-      setState(s => {
-        // Preserve local selection (not from server)
-        return { ...newState, selected: null, validMoves: [] };
-      });
-      setGameKey(k => {
-        // Only increment gameKey on winner reset (new game detection)
-        return k;
-      });
+      setState(() => ({ ...newState, selected: null, validMoves: [] }));
     });
 
     socket.on('game:error', ({ message }: { message: string }) => {

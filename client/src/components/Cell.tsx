@@ -51,7 +51,7 @@ export default function Cell({ stack, index, isHighlighted, isSelected, onClick 
       whileTap={{ scale: 0.95 }}
     >
       <div className="w-4/5 h-4/5 flex items-center justify-center">
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {stack.length > 0 ? (
             <motion.svg
               key={stack.join(',')}
@@ -59,7 +59,7 @@ export default function Cell({ stack, index, isHighlighted, isSelected, onClick 
               className="w-full h-full overflow-visible"
               initial={{ scale: 0.5, opacity: 0, y: -12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.5, opacity: 0, y: 12 }}
+              exit={{ scale: 0.5, opacity: 0, y: 12, transition: { duration: 0.08 } }}
               transition={{ type: 'spring', stiffness: 380, damping: 26 }}
             >
               {stack.map(piece => {
@@ -86,7 +86,7 @@ export default function Cell({ stack, index, isHighlighted, isSelected, onClick 
               className="w-2 h-2 rounded-full bg-gray-700"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.05 } }}
             />
           )}
         </AnimatePresence>

@@ -112,7 +112,7 @@ export function initGameState(): GameState {
       Red: makeReserve('Red'),
       Yellow: makeReserve('Yellow'),
     },
-    currentPlayer: 'Red',
+    currentPlayer: Math.random() < 0.5 ? 'Red' : 'Yellow',
     selected: null,
     validMoves: [],
     phase: 'place',

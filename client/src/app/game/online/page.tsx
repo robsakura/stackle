@@ -61,7 +61,11 @@ export default function OnlineGamePage() {
         onNewGame={handleNewGame}
         showNewGameAlways={false}
         statusMessage={
-          state.currentPlayer !== mySlot ? `Waiting for ${opponentPlayer}…` : undefined
+          errorMessage
+            ? errorMessage
+            : state.currentPlayer !== mySlot
+            ? `Waiting for ${opponentPlayer}…`
+            : undefined
         }
         backButton={
           <button
@@ -121,7 +125,7 @@ export default function OnlineGamePage() {
           <button
             onClick={() => joinRoom(joinCode)}
             disabled={joinCode.length < 1 || roomStatus === 'connecting'}
-            className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-lg transition-colors"
+            className="w-full py-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 text-gray-900 font-semibold text-lg transition-colors"
           >
             Join Room
           </button>

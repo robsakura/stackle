@@ -8,8 +8,10 @@ import {
   getRoomBySocket,
   getSlotForSocket,
   joinRoom,
+  rejoinRoom,
   removePlayer,
   resetRoom,
+  scheduleRemovePlayer,
 } from './roomManager';
 
 const app = express();
@@ -78,12 +80,27 @@ io.on('connection', socket => {
     }
   });
 
+  socket.on(
+    'room:rejoin',
+    ({ roomCode, slot }: { roomCode: string; slot: import('./lib/types').Player }) => {
+      try {
+        const { room, state } = rejoinRoom(socket.id, roomCode, slot);
+        socket.join(roomCode);
+        socket.emit('room:rejoined', { slot, state });
+        console.log(`rejoined: ${socket.id} slot=${slot} room=${roomCode}`);
+      } catch (err) {
+        socket.emit('game:error', { message: (err as Error).message });
+      }
+    }
+  );
+
   socket.on('disconnect', () => {
     console.log('disconnected:', socket.id);
     const room = getRoomBySocket(socket.id);
     if (room) {
-      removePlayer(socket.id);
-      socket.to(room.code).emit('game:error', { message: 'Opponent disconnected' });
+      scheduleRemovePlayer(socket.id);
+      // Notify opponent but let them keep playing; if the player reconnects within 60s it's fine
+      socket.to(room.code).emit('game:opponent_disconnected');
     }
   });
 });

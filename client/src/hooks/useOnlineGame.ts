@@ -19,11 +19,16 @@ export function useOnlineGame() {
   const [errorMessage, setErrorMessage] = useState('');
   const socketRef = useRef<Socket | null>(null);
   const roomCodeRef = useRef('');
+  const mySlotRef = useRef<Player>('Red');
 
-  // Keep roomCodeRef in sync
+  // Keep refs in sync
   useEffect(() => {
     roomCodeRef.current = roomCode;
   }, [roomCode]);
+
+  useEffect(() => {
+    mySlotRef.current = mySlot;
+  }, [mySlot]);
 
   // Persist state when it changes
   useEffect(() => {
@@ -43,11 +48,24 @@ export function useOnlineGame() {
     const socket = io(SERVER_URL, { transports: ['polling', 'websocket'] });
     socketRef.current = socket;
 
+    // Auto-rejoin if we were in a room when the connection dropped
+    socket.on('connect', () => {
+      if (roomCodeRef.current) {
+        socket.emit('room:rejoin', {
+          roomCode: roomCodeRef.current,
+          slot: mySlotRef.current,
+        });
+      }
+    });
+
     socket.on('connect_error', (err) => {
       setErrorMessage(`Could not reach server: ${err.message}`);
-      setRoomStatus('error');
-      socketRef.current?.disconnect();
-      socketRef.current = null;
+      // Only give up entirely if we're not mid-reconnect for an active room
+      if (!roomCodeRef.current) {
+        setRoomStatus('error');
+        socketRef.current?.disconnect();
+        socketRef.current = null;
+      }
     });
 
     socket.on('room:created', ({ roomCode: code, slot }: { roomCode: string; slot: Player }) => {
@@ -63,10 +81,23 @@ export function useOnlineGame() {
 
     socket.on('room:full', () => {
       setRoomStatus('playing');
+      setErrorMessage('');
     });
 
     socket.on('game:state', (newState: GameState) => {
       setState(() => ({ ...newState, selected: null, validMoves: [] }));
+      setErrorMessage('');
+    });
+
+    socket.on('room:rejoined', ({ slot, state: newState }: { slot: Player; state: GameState }) => {
+      setMySlot(slot);
+      setState(() => ({ ...newState, selected: null, validMoves: [] }));
+      setRoomStatus('playing');
+    });
+
+    socket.on('game:opponent_disconnected', () => {
+      // Don't error — opponent has 60 s grace period to come back
+      setErrorMessage('Opponent disconnected — waiting for them to reconnect…');
     });
 
     socket.on('game:error', ({ message }: { message: string }) => {
@@ -75,8 +106,12 @@ export function useOnlineGame() {
     });
 
     socket.on('disconnect', () => {
-      setRoomStatus('error');
-      setErrorMessage('Disconnected from server');
+      // Socket.io will try to reconnect automatically.
+      // Only show an error if we were idle (not in a room).
+      if (!roomCodeRef.current) {
+        setRoomStatus('error');
+        setErrorMessage('Disconnected from server');
+      }
     });
   }, []);
 

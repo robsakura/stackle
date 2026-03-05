@@ -9,6 +9,9 @@ interface Room {
 }
 
 const rooms = new Map<string, Room>();
+const disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+const GRACE_PERIOD_MS = 60_000; // 60 seconds before a player is truly removed
 
 function randomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -84,7 +87,59 @@ export function resetRoom(code: string): GameState {
   return room.state;
 }
 
+/** Schedule player removal after grace period. Cancels any existing timer for this socket. */
+export function scheduleRemovePlayer(socketId: string): void {
+  // Cancel any existing timer for this socket
+  const existing = disconnectTimers.get(socketId);
+  if (existing) clearTimeout(existing);
+
+  const timer = setTimeout(() => {
+    disconnectTimers.delete(socketId);
+    for (const [code, room] of rooms.entries()) {
+      if (room.players.Red === socketId) room.players.Red = null;
+      if (room.players.Yellow === socketId) room.players.Yellow = null;
+      if (!room.players.Red && !room.players.Yellow) {
+        rooms.delete(code);
+      }
+    }
+  }, GRACE_PERIOD_MS);
+
+  disconnectTimers.set(socketId, timer);
+}
+
+/** Rejoin an existing room with a new socket ID. Returns the room and slot, or throws. */
+export function rejoinRoom(
+  newSocketId: string,
+  roomCode: string,
+  slot: Player
+): { room: Room; state: GameState } {
+  const room = rooms.get(roomCode);
+  if (!room) throw new Error('Room not found');
+
+  const slotKey = slot as 'Red' | 'Yellow';
+  const oldSocketId = room.players[slotKey];
+
+  // Cancel any pending removal for the old socket ID
+  if (oldSocketId) {
+    const timer = disconnectTimers.get(oldSocketId);
+    if (timer) {
+      clearTimeout(timer);
+      disconnectTimers.delete(oldSocketId);
+    }
+  }
+
+  room.players[slotKey] = newSocketId;
+  return { room, state: room.state };
+}
+
+/** Immediately remove a player (used only when no rejoin is expected). */
 export function removePlayer(socketId: string): void {
+  // Cancel any pending grace-period timer
+  const timer = disconnectTimers.get(socketId);
+  if (timer) {
+    clearTimeout(timer);
+    disconnectTimers.delete(socketId);
+  }
   for (const [code, room] of rooms.entries()) {
     if (room.players.Red === socketId) room.players.Red = null;
     if (room.players.Yellow === socketId) room.players.Yellow = null;

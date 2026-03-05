@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { GameState, Piece, Player } from '@/lib/types';
 import Board from './Board';
@@ -51,6 +51,28 @@ export default function GameLayout({
   backButton,
 }: GameLayoutProps) {
   const [showHelp, setShowHelp] = useState(false);
+  const scalerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const el = scalerRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const naturalH = el.scrollHeight;
+      const viewportH = window.visualViewport?.height ?? window.innerHeight;
+      setScale(Math.min(1, viewportH / naturalH));
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    window.visualViewport?.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.visualViewport?.removeEventListener('resize', measure);
+    };
+  }, []);
+
   const isMyTurn = state.currentPlayer === myPlayer;
   const isOpponentTurn = state.currentPlayer === opponentPlayer;
 
@@ -58,24 +80,27 @@ export default function GameLayout({
     state.selected?.source === 'reserve' ? state.selected.piece : null;
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
-      <div className="h-full w-full max-w-sm mx-auto flex flex-col">
+    <div className="fixed inset-0 overflow-hidden flex items-center justify-center">
+      <div
+        ref={scalerRef}
+        className="w-full max-w-sm flex flex-col"
+        style={scale < 1 ? { transform: `scale(${scale})`, transformOrigin: 'center center' } : undefined}
+      >
 
         {/* Back button row — above logo */}
         {backButton && (
-          <div className="shrink-0 px-4 pt-3 pb-0 pt-safe">
+          <div className="px-4 pt-3 pb-0 pt-safe">
             {backButton}
           </div>
         )}
 
         {/* Logo */}
-        <div className="shrink-0 px-8 py-1">
+        <div className="px-8 py-1">
           <img src="/stackle_logo_white.png" alt="Stackle" className="w-full" />
         </div>
 
-        {/* Everything else centered as one group — scrollable so nothing is cut on small screens */}
-        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
-        <div className="min-h-full flex flex-col items-center justify-center gap-2 px-4 py-2">
+        {/* Game content — natural height, scaling handles small screens */}
+        <div className="flex flex-col items-center gap-2 px-4 py-2">
 
           {/* Winner banner or turn indicator */}
           <AnimatePresence mode="wait">
@@ -163,10 +188,9 @@ export default function GameLayout({
           </div>
 
         </div>
-        </div>
 
         {/* Google Ads placeholder — always at bottom */}
-        <div className="shrink-0 w-full h-[50px] pb-safe bg-gray-800/50 border-t border-gray-700 flex items-center justify-center">
+        <div className="w-full h-[50px] pb-safe bg-gray-800/50 border-t border-gray-700 flex items-center justify-center">
           <span className="text-xs text-gray-600">Advertisement</span>
         </div>
 

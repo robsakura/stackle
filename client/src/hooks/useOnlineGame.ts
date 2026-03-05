@@ -48,8 +48,8 @@ export function useOnlineGame() {
     const socket = io(SERVER_URL, { transports: ['polling', 'websocket'] });
     socketRef.current = socket;
 
-    // Auto-rejoin if we were in a room when the connection dropped
-    socket.on('connect', () => {
+    // Auto-rejoin only on REconnect (not on the initial connect)
+    socket.io.on('reconnect', () => {
       if (roomCodeRef.current) {
         socket.emit('room:rejoin', {
           roomCode: roomCodeRef.current,

@@ -97,6 +97,7 @@ export function useOnlineGame() {
     (code: string) => {
       setRoomStatus('connecting');
       setErrorMessage('');
+      setRoomCode(code);
       const saved = loadState(`stackle-online-${code}`);
       if (saved) setState(saved);
       if (socketRef.current?.connected) {

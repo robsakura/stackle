@@ -73,8 +73,9 @@ export default function GameLayout({
           <img src="/stackle_logo_white.png" alt="Stackle" className="w-full" />
         </div>
 
-        {/* Everything else centered as one group */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-3 px-4 min-h-0 overflow-hidden">
+        {/* Everything else centered as one group — scrollable so nothing is cut on small screens */}
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+        <div className="min-h-full flex flex-col items-center justify-center gap-2 px-4 py-2">
 
           {/* Winner banner or turn indicator */}
           <AnimatePresence mode="wait">
@@ -161,6 +162,7 @@ export default function GameLayout({
             </button>
           </div>
 
+        </div>
         </div>
 
         {/* Google Ads placeholder — always at bottom */}

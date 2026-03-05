@@ -20,6 +20,7 @@ export function useOnlineGame() {
   const socketRef = useRef<Socket | null>(null);
   const roomCodeRef = useRef('');
   const mySlotRef = useRef<Player>('Red');
+  const prevWinnerRef = useRef<GameState['winner']>(null);
 
   // Keep refs in sync
   useEffect(() => {
@@ -85,6 +86,11 @@ export function useOnlineGame() {
     });
 
     socket.on('game:state', (newState: GameState) => {
+      // Bump gameKey for both players when a new game starts (winner → null transition)
+      if (prevWinnerRef.current !== null && newState.winner === null) {
+        setGameKey(k => k + 1);
+      }
+      prevWinnerRef.current = newState.winner;
       setState(() => ({ ...newState, selected: null, validMoves: [] }));
       setErrorMessage('');
     });
@@ -196,7 +202,6 @@ export function useOnlineGame() {
   const handleNewGame = useCallback(() => {
     if (!roomCodeRef.current) return;
     clearState(`stackle-online-${roomCodeRef.current}`);
-    setGameKey(k => k + 1);
     socketRef.current?.emit('game:new', { roomCode: roomCodeRef.current });
   }, []);
 

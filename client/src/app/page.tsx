@@ -58,7 +58,7 @@ export default function HomePage() {
       </button>
 
       {/* Google Ads placeholder */}
-      <div className="fixed bottom-0 left-0 right-0 h-[50px] bg-gray-800/50 border-t border-gray-700 flex items-center justify-center">
+      <div className="fixed bottom-0 left-0 right-0 h-[50px] pb-safe bg-gray-800/50 border-t border-gray-700 flex items-center justify-center">
         <span className="text-xs text-gray-600">Advertisement</span>
       </div>
 

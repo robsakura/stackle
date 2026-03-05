@@ -63,7 +63,7 @@ export default function GameLayout({
 
         {/* Back button row — above logo */}
         {backButton && (
-          <div className="shrink-0 px-4 pt-3 pb-0">
+          <div className="shrink-0 px-4 pt-3 pb-0 pt-safe">
             {backButton}
           </div>
         )}
@@ -164,7 +164,7 @@ export default function GameLayout({
         </div>
 
         {/* Google Ads placeholder — always at bottom */}
-        <div className="shrink-0 w-full h-[50px] bg-gray-800/50 border-t border-gray-700 flex items-center justify-center">
+        <div className="shrink-0 w-full h-[50px] pb-safe bg-gray-800/50 border-t border-gray-700 flex items-center justify-center">
           <span className="text-xs text-gray-600">Advertisement</span>
         </div>
 

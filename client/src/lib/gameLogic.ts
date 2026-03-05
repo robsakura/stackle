@@ -20,6 +20,12 @@ export function getValidMoves(state: GameState, selection: Selection): number[] 
   const valid: number[] = [];
   for (let i = 0; i < 9; i++) {
     if (selection.source === i) continue;
+    // Board pieces can only move to adjacent cells (including diagonals)
+    if (typeof selection.source === 'number') {
+      const srcRow = Math.floor(selection.source / 3), srcCol = selection.source % 3;
+      const tgtRow = Math.floor(i / 3), tgtCol = i % 3;
+      if (Math.abs(srcRow - tgtRow) > 1 || Math.abs(srcCol - tgtCol) > 1) continue;
+    }
     if (canGobble(selection.piece, state.board[i])) {
       valid.push(i);
     }

@@ -132,6 +132,13 @@ export function getBestMove(state: GameState, difficulty: 'easy' | 'hard'): Move
   const moves = getAllMoves(state, aiPlayer);
   if (moves.length === 0) return null;
 
+  // Always take an immediate win, regardless of difficulty
+  for (const move of moves) {
+    const stateWithSelection = { ...state, selected: move.selection, validMoves: [] };
+    const nextState = applyMove(stateWithSelection, move.targetCell);
+    if (nextState.winner === aiPlayer) return move;
+  }
+
   // Easy: 35% chance of random move
   if (difficulty === 'easy' && Math.random() < 0.35) {
     return moves[Math.floor(Math.random() * moves.length)];

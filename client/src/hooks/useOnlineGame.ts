@@ -34,7 +34,7 @@ export function useOnlineGame() {
 
   const connect = useCallback(() => {
     if (socketRef.current?.connected) return;
-    const socket = io(SERVER_URL, { transports: ['websocket'] });
+    const socket = io(SERVER_URL, { transports: ['polling', 'websocket'] });
     socketRef.current = socket;
 
     socket.on('room:created', ({ roomCode: code, slot }: { roomCode: string; slot: Player }) => {
@@ -75,26 +75,32 @@ export function useOnlineGame() {
   }, []);
 
   const createRoom = useCallback(() => {
-    connect();
     setRoomStatus('connecting');
     setErrorMessage('');
-    // Emit after short delay to ensure socket connects
-    setTimeout(() => {
-      socketRef.current?.emit('room:create');
-    }, 100);
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('room:create');
+    } else {
+      connect();
+      socketRef.current?.once('connect', () => {
+        socketRef.current?.emit('room:create');
+      });
+    }
   }, [connect]);
 
   const joinRoom = useCallback(
     (code: string) => {
-      connect();
       setRoomStatus('connecting');
       setErrorMessage('');
-      // Load saved state if available
       const saved = loadState(`stackle-online-${code}`);
       if (saved) setState(saved);
-      setTimeout(() => {
-        socketRef.current?.emit('room:join', { roomCode: code });
-      }, 100);
+      if (socketRef.current?.connected) {
+        socketRef.current.emit('room:join', { roomCode: code });
+      } else {
+        connect();
+        socketRef.current?.once('connect', () => {
+          socketRef.current?.emit('room:join', { roomCode: code });
+        });
+      }
     },
     [connect]
   );

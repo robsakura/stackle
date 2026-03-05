@@ -26,7 +26,8 @@ export interface UserStats {
 async function incrementField(userId: string, field: 'wins' | 'losses' | 'drops'): Promise<void> {
   const { data } = await supabase.from('users').select(field).eq('id', userId).single();
   if (data) {
-    await supabase.from('users').update({ [field]: (data[field] as number) + 1 }).eq('id', userId);
+    const row = data as Record<string, number>;
+    await supabase.from('users').update({ [field]: row[field] + 1 }).eq('id', userId);
   }
 }
 

@@ -8,7 +8,7 @@ import type { GameState, Piece, Player } from '@/lib/types';
 
 type RoomStatus = 'idle' | 'connecting' | 'waiting' | 'playing' | 'error';
 
-const SERVER_URL = 'http://localhost:3001';
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3001';
 
 export function useOnlineGame() {
   const [state, setState] = useState<GameState>(initGameState);

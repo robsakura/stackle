@@ -16,7 +16,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.CLIENT_URL ?? 'http://localhost:3000',
     methods: ['GET', 'POST'],
   },
 });
@@ -88,7 +88,7 @@ io.on('connection', socket => {
   });
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT ?? 3001;
 httpServer.listen(PORT, () => {
   console.log(`Stackle server running on port ${PORT}`);
 });

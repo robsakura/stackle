@@ -16,9 +16,11 @@ import {
 
 const app = express();
 const httpServer = createServer(app);
+const clientUrl = process.env.CLIENT_URL ?? 'http://localhost:3000';
+const clientUrlWww = clientUrl.replace('://', '://www.');
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL ?? 'http://localhost:3000',
+    origin: [clientUrl, clientUrlWww],
     methods: ['GET', 'POST'],
   },
 });

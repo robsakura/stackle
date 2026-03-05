@@ -132,6 +132,7 @@ export function useOnlineGame() {
         socketRef.current?.emit('game:move', {
           roomCode: roomCodeRef.current,
           targetCell: index,
+          selection: state.selected,
         });
         setState(s => ({ ...s, selected: null, validMoves: [] }));
         return;

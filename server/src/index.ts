@@ -55,9 +55,9 @@ io.on('connection', socket => {
 
   socket.on(
     'game:move',
-    ({ roomCode, targetCell }: { roomCode: string; targetCell: number }) => {
+    ({ roomCode, targetCell, selection }: { roomCode: string; targetCell: number; selection: import('./lib/types').Selection }) => {
       try {
-        const newState = applyServerMove(roomCode, socket.id, targetCell);
+        const newState = applyServerMove(roomCode, socket.id, targetCell, selection);
         io.to(roomCode).emit('game:state', newState);
       } catch (err) {
         socket.emit('game:error', { message: (err as Error).message });

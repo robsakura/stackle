@@ -63,7 +63,8 @@ export function getSlotForSocket(room: Room, socketId: string): Player | null {
 export function applyServerMove(
   code: string,
   socketId: string,
-  targetCell: number
+  targetCell: number,
+  selection: import('./lib/types').Selection
 ): GameState {
   const room = rooms.get(code);
   if (!room) throw new Error('Room not found');
@@ -72,7 +73,7 @@ export function applyServerMove(
   if (!slot) throw new Error('Not a player in this room');
   if (slot !== room.state.currentPlayer) throw new Error('Not your turn');
 
-  room.state = applyMove(room.state, targetCell);
+  room.state = applyMove({ ...room.state, selected: selection }, targetCell);
   return room.state;
 }
 

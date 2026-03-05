@@ -1,10 +1,10 @@
-import type { GameState, Player } from '../../client/src/lib/types';
-import { applyMove, initGameState } from '../../client/src/lib/gameLogic';
+import type { GameState, Player } from './lib/types';
+import { applyMove, initGameState } from './lib/gameLogic';
 
 interface Room {
   code: string;
   state: GameState;
-  players: { Red: string | null; Blue: string | null };
+  players: { Red: string | null; Yellow: string | null };
   createdAt: number;
 }
 
@@ -26,7 +26,7 @@ export function createRoom(socketId: string): { code: string; slot: Player } {
   const room: Room = {
     code,
     state: initGameState(),
-    players: { Red: socketId, Blue: null },
+    players: { Red: socketId, Yellow: null },
     createdAt: Date.now(),
   };
   rooms.set(code, room);
@@ -36,9 +36,9 @@ export function createRoom(socketId: string): { code: string; slot: Player } {
 export function joinRoom(socketId: string, code: string): { slot: Player } {
   const room = rooms.get(code);
   if (!room) throw new Error('Room not found');
-  if (room.players.Blue !== null) throw new Error('Room is full');
-  room.players.Blue = socketId;
-  return { slot: 'Blue' };
+  if (room.players.Yellow !== null) throw new Error('Room is full');
+  room.players.Yellow = socketId;
+  return { slot: 'Yellow' };
 }
 
 export function getRoom(code: string): Room | undefined {
@@ -47,7 +47,7 @@ export function getRoom(code: string): Room | undefined {
 
 export function getRoomBySocket(socketId: string): Room | undefined {
   for (const room of rooms.values()) {
-    if (room.players.Red === socketId || room.players.Blue === socketId) {
+    if (room.players.Red === socketId || room.players.Yellow === socketId) {
       return room;
     }
   }
@@ -56,7 +56,7 @@ export function getRoomBySocket(socketId: string): Room | undefined {
 
 export function getSlotForSocket(room: Room, socketId: string): Player | null {
   if (room.players.Red === socketId) return 'Red';
-  if (room.players.Blue === socketId) return 'Blue';
+  if (room.players.Yellow === socketId) return 'Yellow';
   return null;
 }
 
@@ -86,8 +86,8 @@ export function resetRoom(code: string): GameState {
 export function removePlayer(socketId: string): void {
   for (const [code, room] of rooms.entries()) {
     if (room.players.Red === socketId) room.players.Red = null;
-    if (room.players.Blue === socketId) room.players.Blue = null;
-    if (!room.players.Red && !room.players.Blue) {
+    if (room.players.Yellow === socketId) room.players.Yellow = null;
+    if (!room.players.Red && !room.players.Yellow) {
       rooms.delete(code);
     }
   }

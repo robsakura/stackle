@@ -10,6 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "../client/src/lib/types.ts", "../client/src/lib/gameLogic.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

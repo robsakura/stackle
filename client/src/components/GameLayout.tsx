@@ -151,7 +151,7 @@ export default function GameLayout({
                 <div className="flex items-center gap-2 text-sm font-semibold tracking-wide">
                   <span className={`w-2.5 h-2.5 rounded-full ${PLAYER_BG[state.currentPlayer]}`} />
                   <span className={PLAYER_COLORS[state.currentPlayer]}>
-                    {playerLabel(state.currentPlayer)}&apos;s turn
+                    {playerLabel(state.currentPlayer) === 'You' ? 'Your turn' : `${playerLabel(state.currentPlayer)}'s turn`}
                   </span>
                 </div>
                 {statusMessage && <p className="text-xs text-gray-400">{statusMessage}</p>}

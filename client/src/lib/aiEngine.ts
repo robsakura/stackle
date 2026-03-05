@@ -145,8 +145,8 @@ export function getBestMove(state: GameState, difficulty: 'easy' | 'hard'): Move
   }
 
   const depth = difficulty === 'easy' ? 1 : 5;
-  let bestMove = moves[0];
   let bestScore = -Infinity;
+  const bestMoves: Move[] = [];
 
   for (const move of moves) {
     const stateWithSelection = { ...state, selected: move.selection, validMoves: [] };
@@ -154,9 +154,12 @@ export function getBestMove(state: GameState, difficulty: 'easy' | 'hard'): Move
     const score = minimax(nextState, depth - 1, -Infinity, Infinity, false, aiPlayer);
     if (score > bestScore) {
       bestScore = score;
-      bestMove = move;
+      bestMoves.length = 0;
+      bestMoves.push(move);
+    } else if (score === bestScore) {
+      bestMoves.push(move);
     }
   }
 
-  return bestMove;
+  return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 }

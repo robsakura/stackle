@@ -1,11 +1,15 @@
 import type { GameState, Player } from './lib/types';
 import { applyMove, initGameState } from './lib/gameLogic';
 
-interface Room {
+export interface Room {
   code: string;
   state: GameState;
   players: { Red: string | null; Yellow: string | null };
   createdAt: number;
+  ranked: boolean;
+  userIds: { Red: string | null; Yellow: string | null };
+  nicknames: { Red: string | null; Yellow: string | null };
+  resultRecorded: boolean;
 }
 
 const rooms = new Map<string, Room>();
@@ -31,9 +35,35 @@ export function createRoom(socketId: string): { code: string; slot: Player } {
     state: initGameState(),
     players: { Red: socketId, Yellow: null },
     createdAt: Date.now(),
+    ranked: false,
+    userIds: { Red: null, Yellow: null },
+    nicknames: { Red: null, Yellow: null },
+    resultRecorded: false,
   };
   rooms.set(code, room);
   return { code, slot: 'Red' };
+}
+
+export function createRankedRoom(
+  socketIdRed: string, userIdRed: string, nicknameRed: string,
+  socketIdYellow: string, userIdYellow: string, nicknameYellow: string
+): { code: string; state: GameState } {
+  let code = randomCode();
+  while (rooms.has(code)) code = randomCode();
+
+  const state = initGameState();
+  const room: Room = {
+    code,
+    state,
+    players: { Red: socketIdRed, Yellow: socketIdYellow },
+    createdAt: Date.now(),
+    ranked: true,
+    userIds: { Red: userIdRed, Yellow: userIdYellow },
+    nicknames: { Red: nicknameRed, Yellow: nicknameYellow },
+    resultRecorded: false,
+  };
+  rooms.set(code, room);
+  return { code, state };
 }
 
 export function joinRoom(socketId: string, code: string): { slot: Player } {
@@ -87,14 +117,14 @@ export function resetRoom(code: string): GameState {
   return room.state;
 }
 
-/** Schedule player removal after grace period. Cancels any existing timer for this socket. */
-export function scheduleRemovePlayer(socketId: string): void {
-  // Cancel any existing timer for this socket
+/** Schedule player removal after grace period. Calls onExpired (if provided) when timer fires. */
+export function scheduleRemovePlayer(socketId: string, onExpired?: () => void): void {
   const existing = disconnectTimers.get(socketId);
   if (existing) clearTimeout(existing);
 
   const timer = setTimeout(() => {
     disconnectTimers.delete(socketId);
+    onExpired?.();
     for (const [code, room] of rooms.entries()) {
       if (room.players.Red === socketId) room.players.Red = null;
       if (room.players.Yellow === socketId) room.players.Yellow = null;
@@ -119,7 +149,6 @@ export function rejoinRoom(
   const slotKey = slot as 'Red' | 'Yellow';
   const oldSocketId = room.players[slotKey];
 
-  // Cancel any pending removal for the old socket ID
   if (oldSocketId) {
     const timer = disconnectTimers.get(oldSocketId);
     if (timer) {
@@ -134,7 +163,6 @@ export function rejoinRoom(
 
 /** Immediately remove a player (used only when no rejoin is expected). */
 export function removePlayer(socketId: string): void {
-  // Cancel any pending grace-period timer
   const timer = disconnectTimers.get(socketId);
   if (timer) {
     clearTimeout(timer);

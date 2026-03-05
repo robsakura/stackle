@@ -36,6 +36,9 @@ export default function HomePage() {
         <img src="/stackle_logo_white.png" alt="Stackle" className="w-full" />
       </div>
       <div className="flex flex-col gap-4 w-full max-w-xs">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest text-center">
+          Guest Play
+        </p>
         <Link
           href="/game/local"
           className="w-full py-4 rounded-2xl bg-rose-500 hover:bg-rose-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
@@ -46,7 +49,20 @@ export default function HomePage() {
           href="/game/online"
           className="w-full py-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-semibold text-center text-lg transition-colors shadow-lg"
         >
-          Online PvP
+          Unranked Online PvP
+        </Link>
+
+        <div className="flex items-center gap-3 my-1">
+          <div className="h-px flex-1 bg-gray-700" />
+          <span className="text-xs text-gray-500 uppercase tracking-widest">Ranked Matches</span>
+          <div className="h-px flex-1 bg-gray-700" />
+        </div>
+
+        <Link
+          href="/ranked"
+          className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
+        >
+          Login / Play Ranked
         </Link>
       </div>
 

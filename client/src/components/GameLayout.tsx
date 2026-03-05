@@ -26,6 +26,10 @@ interface GameLayoutProps {
   showNewGameAlways?: boolean;
   statusMessage?: string;
   backButton?: React.ReactNode;
+  playerNickname?: string;
+  opponentNickname?: string;
+  onPlayerClick?: () => void;
+  onOpponentClick?: () => void;
 }
 
 const PLAYER_COLORS: Record<Player, string> = {
@@ -49,7 +53,16 @@ export default function GameLayout({
   showNewGameAlways = false,
   statusMessage,
   backButton,
+  playerNickname,
+  opponentNickname,
+  onPlayerClick,
+  onOpponentClick,
 }: GameLayoutProps) {
+  const playerLabel = (player: Player) => {
+    if (player === myPlayer && playerNickname) return playerNickname;
+    if (player === opponentPlayer && opponentNickname) return opponentNickname;
+    return player;
+  };
   const [showHelp, setShowHelp] = useState(false);
   const scalerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -122,7 +135,7 @@ export default function GameLayout({
                   <div className="flex items-center gap-2">
                     <span className={`w-3 h-3 rounded-full ${PLAYER_BG[state.winner]}`} />
                     <div className={`text-2xl font-bold ${PLAYER_COLORS[state.winner]}`}>
-                      {state.winner} wins!
+                      {playerLabel(state.winner)} wins!
                     </div>
                   </div>
                 )}
@@ -138,7 +151,7 @@ export default function GameLayout({
                 <div className="flex items-center gap-2 text-sm font-semibold tracking-wide">
                   <span className={`w-2.5 h-2.5 rounded-full ${PLAYER_BG[state.currentPlayer]}`} />
                   <span className={PLAYER_COLORS[state.currentPlayer]}>
-                    {state.currentPlayer}&apos;s turn
+                    {playerLabel(state.currentPlayer)}&apos;s turn
                   </span>
                 </div>
                 {statusMessage && <p className="text-xs text-gray-400">{statusMessage}</p>}
@@ -146,6 +159,14 @@ export default function GameLayout({
             )}
           </AnimatePresence>
 
+          {opponentNickname && (
+            <button
+              onClick={onOpponentClick}
+              className={`text-xs font-semibold ${PLAYER_COLORS[opponentPlayer]} self-start ml-1 hover:opacity-75 transition-opacity`}
+            >
+              {opponentNickname}
+            </button>
+          )}
           <Reserve
             pieces={state.reserves[opponentPlayer]}
             player={opponentPlayer}
@@ -168,6 +189,14 @@ export default function GameLayout({
             isActive={isMyTurn}
             onPieceClick={onReserveClick}
           />
+          {playerNickname && (
+            <button
+              onClick={onPlayerClick}
+              className={`text-xs font-semibold ${PLAYER_COLORS[myPlayer]} self-end mr-1 hover:opacity-75 transition-opacity`}
+            >
+              {playerNickname}
+            </button>
+          )}
 
           {/* New game + how to play — inside centered group so they never overlap */}
           <div className="flex items-center gap-4 pt-1">

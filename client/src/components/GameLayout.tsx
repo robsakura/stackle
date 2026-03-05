@@ -135,7 +135,7 @@ export default function GameLayout({
                   <div className="flex items-center gap-2">
                     <span className={`w-3 h-3 rounded-full ${PLAYER_BG[state.winner]}`} />
                     <div className={`text-2xl font-bold ${PLAYER_COLORS[state.winner]}`}>
-                      {playerLabel(state.winner)} wins!
+                      {playerLabel(state.winner)}{playerLabel(state.winner) === 'You' ? ' win!' : ' wins!'}
                     </div>
                   </div>
                 )}

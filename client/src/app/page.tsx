@@ -46,6 +46,12 @@ export default function HomePage() {
           Local PvP
         </Link>
         <Link
+          href="/game/cpu"
+          className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
+        >
+          vs CPU
+        </Link>
+        <Link
           href="/game/online"
           className="w-full py-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-semibold text-center text-lg transition-colors shadow-lg"
         >

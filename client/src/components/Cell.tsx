@@ -51,7 +51,7 @@ export default function Cell({ stack, index, isHighlighted, isSelected, onClick 
       whileTap={{ scale: 0.95 }}
     >
       <div className="w-4/5 h-4/5 flex items-center justify-center">
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {stack.length > 0 ? (
             <motion.svg
               key={stack.join(',')}

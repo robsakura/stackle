@@ -88,7 +88,9 @@ io.on('connection', socket => {
   });
 });
 
-const PORT = process.env.PORT ?? 3001;
-httpServer.listen(PORT, () => {
+const PORT = parseInt(process.env.PORT ?? '3001', 10);
+console.log(`Starting server. PORT env: ${process.env.PORT}, using: ${PORT}`);
+console.log(`CLIENT_URL: ${process.env.CLIENT_URL}`);
+httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`Stackle server running on port ${PORT}`);
 });

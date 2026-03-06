@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useAIGame } from '@/hooks/useAIGame';
 import GameLayout from '@/components/GameLayout';
 
-type Difficulty = 'easy' | 'hard';
+type Difficulty = 'easy' | 'challenging' | 'expert';
 
 function DifficultyPicker({ onSelect }: { onSelect: (d: Difficulty) => void }) {
   return (
@@ -24,10 +24,16 @@ function DifficultyPicker({ onSelect }: { onSelect: (d: Difficulty) => void }) {
           Easy
         </button>
         <button
-          onClick={() => onSelect('hard')}
+          onClick={() => onSelect('challenging')}
+          className="w-full py-4 rounded-2xl bg-yellow-500 hover:bg-yellow-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
+        >
+          Challenging
+        </button>
+        <button
+          onClick={() => onSelect('expert')}
           className="w-full py-4 rounded-2xl bg-orange-500 hover:bg-orange-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
         >
-          Hard
+          Expert
         </button>
       </div>
       <Link href="/" className="text-sm text-gray-500 hover:text-gray-300 underline underline-offset-4 transition-colors">

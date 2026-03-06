@@ -8,7 +8,7 @@ import type { GameState, Piece } from '@/lib/types';
 const AI_PLAYER = 'Yellow' as const;
 const HUMAN_PLAYER = 'Red' as const;
 
-export function useAIGame(difficulty: 'easy' | 'hard') {
+export function useAIGame(difficulty: 'easy' | 'challenging' | 'expert') {
   const [state, setState] = useState<GameState>(initGameState);
   const [gameKey, setGameKey] = useState(0);
   const thinkingRef = useRef(false);

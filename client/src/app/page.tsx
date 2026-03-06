@@ -57,22 +57,22 @@ export default function HomePage() {
           Guest Play
         </p>
         <Link
-          href="/game/local"
-          className="w-full py-4 rounded-2xl bg-rose-500 hover:bg-rose-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
-        >
-          Local PvP
-        </Link>
-        <Link
           href="/game/cpu"
           className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
         >
-          vs CPU
+          Single Player
+        </Link>
+        <Link
+          href="/game/local"
+          className="w-full py-4 rounded-2xl bg-rose-500 hover:bg-rose-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
+        >
+          Tabletop
         </Link>
         <Link
           href="/game/online"
           className="w-full py-4 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-semibold text-center text-lg transition-colors shadow-lg"
         >
-          Unranked Online PvP
+          Play Online with Friends
         </Link>
 
         <div className="flex items-center gap-3 my-1">
@@ -85,7 +85,7 @@ export default function HomePage() {
           href="/ranked"
           className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-white font-semibold text-center text-lg transition-colors shadow-lg"
         >
-          Login / Play Ranked
+          Ranked PvP
         </Link>
       </div>
 

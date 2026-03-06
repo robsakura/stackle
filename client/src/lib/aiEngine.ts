@@ -127,7 +127,7 @@ function minimax(
   }
 }
 
-export function getBestMove(state: GameState, difficulty: 'easy' | 'hard'): Move | null {
+export function getBestMove(state: GameState, difficulty: 'easy' | 'challenging' | 'expert'): Move | null {
   const aiPlayer: Player = 'Yellow';
   const moves = getAllMoves(state, aiPlayer);
   if (moves.length === 0) return null;
@@ -144,7 +144,7 @@ export function getBestMove(state: GameState, difficulty: 'easy' | 'hard'): Move
     return moves[Math.floor(Math.random() * moves.length)];
   }
 
-  const depth = difficulty === 'easy' ? 1 : 5;
+  const depth = difficulty === 'easy' ? 1 : difficulty === 'challenging' ? 3 : 5;
   let bestScore = -Infinity;
   const bestMoves: Move[] = [];
 

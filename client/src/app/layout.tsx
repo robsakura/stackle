@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import Providers from '@/components/Providers';
+import Analytics from '@/components/Analytics';
 
 export const metadata: Metadata = {
   title: 'Stackle',
@@ -31,7 +32,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         gtag('config', 'G-PXLNT2MJY1');
       `}</Script>
       <body className="bg-gray-950 text-white min-h-screen antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          <Analytics />
+          {children}
+        </Providers>
       </body>
     </html>
   );

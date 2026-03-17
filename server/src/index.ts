@@ -21,11 +21,12 @@ import type { Player, Selection } from './lib/types';
 
 const app = express();
 const httpServer = createServer(app);
-const clientUrl = process.env.CLIENT_URL ?? 'http://localhost:3000';
-const clientUrlWww = clientUrl.replace('://', '://www.');
+const clientUrls = (process.env.CLIENT_URL ?? 'http://localhost:3000')
+  .split(',')
+  .flatMap(url => [url.trim(), url.trim().replace('://', '://www.')]);
 
 const corsOptions = {
-  origin: [clientUrl, clientUrlWww],
+  origin: clientUrls,
   methods: ['GET', 'POST'],
 };
 
